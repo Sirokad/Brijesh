@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Procurement Screen</title>
+  <style>
+    :root {
+      --bg: #e8ecf0;
+      --navy: #1e3a5f;
+      --navy-dark: #112e4e;
+      --navy-border: #154468;
+      --blue-soft: #7fafd4;
+      --blue-accent: #60a5fa;
+      --page-bg: #f1f5f9;
+      --card-border: #e2e8f0;
+      --muted: #94a3b8;
+      --text: #0f172a;
+      --green: #059669;
+      --green-soft: #f0fdf4;
+      --green-border: #bbf7d0;
+      --amber-soft: #fffbeb;
+      --amber-border: #fde68a;
+      --amber-left: #f59e0b;
+      --amber-text: #92400e;
+      --amber-subtext: #b45309;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --danger-border: #fecaca;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .selector-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .selector-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-right: 4px;
+    }
+
+    .selector-btn {
+      padding: 6px 14px;
+      border-radius: 5px;
+      font-size: 12px;
+      cursor: pointer;
+      background: white;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      font-weight: 400;
+      transition: 0.15s ease;
+    }
+
+    .selector-btn.active {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+      font-weight: 600;
+    }
+
+    .window {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid #b0bec5;
+    }
+
+    .title-shell { background: var(--navy); }
+
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--navy-border);
+      gap: 10px;
+    }
+
+    .traffic {
+      display: flex;
+      gap: 6px;
+    }
+
+    .traffic-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .address-bar {
+      flex: 1;
+      background: var(--navy-dark);
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: var(--blue-soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 2px;
+      flex-wrap: wrap;
+    }
+
+    .top-nav-item {
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--blue-soft);
+      border-bottom: 2px solid transparent;
+    }
+
+    .top-nav-item.active {
+      color: white;
+      border-bottom-color: var(--blue-accent);
+      font-weight: 600;
+    }
+
+    .top-nav-user {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--blue-soft);
+      padding: 8px 0;
+    }
+
+    .top-nav-user span { color: #fcd34d; }
+
+    .page-header {
+      background: #f8fafc;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .page-title .ref { color: #2563eb; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .content {
+      padding: 20px;
+      background: var(--page-bg);
+    }
+
+    .status-banner {
+      background: var(--amber-soft);
+      border: 1px solid var(--amber-border);
+      border-left: 4px solid var(--amber-left);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-icon { font-size: 16px; }
+    .status-title { font-size: 12px; font-weight: 700; color: var(--amber-text); }
+    .status-sub { font-size: 11px; color: var(--amber-subtext); }
+
+    .badge {
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+    }
+
+    .card-title {
+      background: #f8fafc;
+      border-bottom: 1px solid var(--card-border);
+      padding: 8px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #475569;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .card-body { padding: 12px 14px; }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid #f1f5f9;
+      gap: 8px;
+    }
+
+    .row-label {
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .row-value {
+      font-size: 11px;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .row-value.bold { font-weight: 700; }
+    .row-value.highlight { color: var(--green); }
+
+    .divider {
+      height: 1px;
+      background: var(--card-border);
+      margin: 8px 0;
+    }
+
+    .budget-ok {
+      margin-top: 10px;
+      background: var(--green-soft);
+      border: 1px solid var(--green-border);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #166534;
+    }
+
+    .workflow {
+      background: white;
+      border-radius: 8px;
+      border: 2px solid var(--navy);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .workflow-head {
+      background: var(--navy);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .workflow-title { font-size: 12px; font-weight: 700; color: white; }
+    .workflow-sub { font-size: 10px; color: var(--blue-soft); margin-top: 2px; }
+    .workflow-meta { font-size: 10px; color: var(--blue-soft); }
+
+    .workflow-body { padding: 20px 14px; }
+
+    .workflow-track {
+      display: flex;
+      align-items: flex-start;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .wf-node {
+      flex: 1 1 0;
+      min-width: 165px;
+      border-radius: 8px;
+      padding: 10px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .wf-node.highlight { box-shadow: 0 0 10px rgba(252, 211, 77, 0.5); }
+    .wf-step {
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 1px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      margin-bottom: 4px;
+    }
+    .wf-icon { font-size: 15px; margin-bottom: 3px; }
+    .wf-title { font-size: 10px; color: #64748b; margin-bottom: 2px; }
+    .wf-name { font-size: 11px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 2px; }
+    .wf-sub { font-size: 9px; color: var(--muted); margin-bottom: 7px; }
+    .wf-badge {
+      display: inline-block;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-bottom: 6px;
+    }
+    .wf-foot {
+      border-top: 1px solid var(--card-border);
+      padding-top: 6px;
+      font-size: 9px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .wf-foot span { color: #475569; }
+
+    .wf-node.done {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+    .wf-node.done .wf-badge {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .wf-node.active {
+      background: #fffbeb;
+      border: 2px solid #fcd34d;
+    }
+    .wf-node.active .wf-badge {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .wf-node.waiting {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .wf-node.waiting .wf-badge {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .arrow {
+      flex-shrink: 0;
+      width: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 50px;
+    }
+
+    .arrow-line {
+      width: 12px;
+      height: 2px;
+      position: relative;
+      background: #cbd5e1;
+    }
+
+    .arrow-line::after {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: -4px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 6px solid #cbd5e1;
+    }
+
+    .arrow.done .arrow-line { background: #86efac; }
+    .arrow.done .arrow-line::after { border-left-color: #86efac; }
+
+    .system-note {
+      margin-top: 14px;
+      background: #eff6ff;
+      border-radius: 5px;
+      border: 1px solid #bfdbfe;
+      padding: 9px 12px;
+      font-size: 11px;
+      color: #1d4ed8;
+    }
+
+    .action-bar {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .action-text {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .action-text strong { color: var(--text); }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 5px;
+      font-size: 11px;
+      cursor: default;
+      font-weight: 500;
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid var(--card-border);
+    }
+
+    .btn.primary {
+      background: var(--navy);
+      color: white;
+      border: none;
+    }
+
+    .btn.danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    @media (max-width: 860px) {
+      body { padding: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .workflow-track { min-width: max-content; }
+      .top-nav-user { width: 100%; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="selector-bar">
+    <span class="selector-label">Select PO Value →</span>
+    <button class="selector-btn" data-index="0">KWD 8,500</button>
+    <button class="selector-btn active" data-index="1">KWD 32,000</button>
+    <button class="selector-btn" data-index="2">KWD 70,000</button>
+  </div>
+
+  <div class="window">
+    <div class="title-shell">
+      <div class="browser-bar">
+        <div class="traffic">
+          <div class="traffic-dot" style="background:#ff5f57"></div>
+          <div class="traffic-dot" style="background:#febc2e"></div>
+          <div class="traffic-dot" style="background:#28c840"></div>
+        </div>
+        <div class="address-bar" id="addressBar"></div>
+      </div>
+      <div class="top-nav">
+        <div class="top-nav-item">Home</div>
+        <div class="top-nav-item active">Procurement</div>
+        <div class="top-nav-item">Finance</div>
+        <div class="top-nav-item">HR</div>
+        <div class="top-nav-item">Reports</div>
+        <div class="top-nav-user">👤 Internal Audit &nbsp;·&nbsp; <span>Al Rashid Group ERP</span></div>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div class="page-title">Purchase Requisition &nbsp;<span class="ref" id="pageRef"></span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn">Print</button>
+        <button class="btn">Export PDF</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="status-banner">
+        <div class="status-left">
+          <span class="status-icon">⏳</span>
+          <div>
+            <div class="status-title">Pending Authorization</div>
+            <div class="status-sub">Awaiting action from <strong id="statusAuth"></strong></div>
+          </div>
+        </div>
+        <div class="badge" id="statusBadge"></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Requisition Details</div>
+          <div class="card-body" id="detailsCard"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Budget Check</div>
+          <div class="card-body" id="budgetCard"></div>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-head">
+          <div>
+            <div class="workflow-title">Approval Workflow</div>
+            <div class="workflow-sub" id="workflowSub"></div>
+          </div>
+          <div class="workflow-meta">3 Steps · 2 Finance / Purchase Gates</div>
+        </div>
+        <div class="workflow-body">
+          <div class="workflow-track" id="workflowTrack"></div>
+          <div class="system-note">
+            <strong>System note:</strong> Authorizer and Approver are auto-assigned from the Delegation of Authority matrix based on PO value. They must be two different individuals. Only these two are notified — no manual routing required.
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div class="action-text">Action required from: &nbsp;<strong id="actionAuth"></strong>&nbsp;·&nbsp;<span id="actionRef"></span></div>
+        <div class="btn-row">
+          <button class="btn">Save Draft</button>
+          <button class="btn">← Return</button>
+          <button class="btn danger">Reject ✕</button>
+          <button class="btn primary">Authorize →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const EXAMPLES = [
+      {
+        amount: 8500,
+        ref: "PR-2026-0312",
+        desc: "Workshop Tools & Equipment",
+        supplier: "Gulf Technical Supplies Co.",
+        dept: "Operations – KOMC",
+        budget: "OPEX-2026-Q2",
+        badge: "STANDARD",
+        badgeColor: "#2563eb",
+        auth: "Div. Head of Purchase",
+        authGrade: "Grade 12 SL · DoA <10,000",
+        approver: "Business Unit Head",
+        appGrade: "Grade 13 · DoA <10,000"
+      },
+      {
+        amount: 32000,
+        ref: "PR-2026-0847",
+        desc: "Valve Components – KNPC Supply Order",
+        supplier: "Al Maha Industrial LLC",
+        dept: "Supply Chain – Q80",
+        budget: "OPEX-2026-Q2",
+        badge: "SIGNIFICANT",
+        badgeColor: "#d97706",
+        auth: "Business Unit Head",
+        authGrade: "Grade 13 · DoA <50,000",
+        approver: "Managing Director",
+        appGrade: "Grade 14 · DoA <50,000"
+      },
+      {
+        amount: 70000,
+        ref: "PR-2026-1103",
+        desc: "Industrial Equipment – ESD Procurement",
+        supplier: "Khalij Equipment Trading",
+        dept: "Equipment Supply – ESD",
+        budget: "CAPEX-2026-Q2",
+        badge: "MAJOR",
+        badgeColor: "#dc2626",
+        auth: "Managing Director",
+        authGrade: "Grade 14 · DoA <50,000",
+        approver: "Group CFO / Deputy CEO",
+        appGrade: "Grade 15 · DoA >50,000"
+      }
+    ];
+
+    const today = "22 Apr 2026";
+    let currentIndex = 1;
+
+    function formatAmount(value) {
+      return `KWD ${value.toLocaleString()}`;
+    }
+
+    function row(label, value, options = {}) {
+      const valueClasses = ["row-value"];
+      if (options.bold) valueClasses.push("bold");
+      if (options.highlight) valueClasses.push("highlight");
+      return `
+        <div class="row">
+          <span class="row-label">${label}</span>
+          <span class="${valueClasses.join(' ')}">${value}</span>
+        </div>
+      `;
+    }
+
+    function node(stepLabel, icon, title, name, sub, status, date, note, highlight = false) {
+      const badgeLabel = status === 'done' ? '✓ Done' : status === 'active' ? '⏳ Action Required' : '○ Awaiting';
+      return `
+        <div class="wf-node ${status} ${highlight ? 'highlight' : ''}">
+          <div class="wf-step">${stepLabel}</div>
+          <div class="wf-icon">${icon}</div>
+          <div class="wf-title">${title}</div>
+          <div class="wf-name">${name}</div>
+          <div class="wf-sub">${sub}</div>
+          <div class="wf-badge">${badgeLabel}</div>
+          <div class="wf-foot">
+            <div>Date: <span>${date}</span></div>
+            <div>Note: <span>${note}</span></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function arrow(done) {
+      return `<div class="arrow ${done ? 'done' : ''}"><div class="arrow-line"></div></div>`;
+    }
+
+    function render() {
+      const ex = EXAMPLES[currentIndex];
+      const remaining = 280000 - 147200 - ex.amount;
+
+      document.getElementById('addressBar').textContent = `erp.alrashidgroup.com · Procurement · Purchase Requisitions · ${ex.ref}`;
+      document.getElementById('breadcrumb').textContent = `Procurement › Purchase Requisitions › ${ex.ref}`;
+      document.getElementById('pageRef').textContent = ex.ref;
+      document.getElementById('statusAuth').textContent = ex.auth;
+      document.getElementById('statusBadge').textContent = `${ex.badge} · ${formatAmount(ex.amount)}`;
+      document.getElementById('statusBadge').style.background = ex.badgeColor;
+      document.getElementById('workflowSub').textContent = `Auto-generated · DoA v1, April 2026 · PO Value ${formatAmount(ex.amount)}`;
+      document.getElementById('actionAuth').textContent = ex.auth;
+      document.getElementById('actionRef').textContent = ex.ref;
+
+      document.getElementById('detailsCard').innerHTML = [
+        row('PR Reference', ex.ref, { bold: true }),
+        row('Description', ex.desc),
+        row('Supplier', ex.supplier),
+        row('Department', ex.dept),
+        row('Budget Code', ex.budget),
+        row('Date Raised', today),
+        row('Total Value', formatAmount(ex.amount), { bold: true, highlight: true })
+      ].join('');
+
+      document.getElementById('budgetCard').innerHTML = [
+        row(`Approved Budget (${ex.budget.startsWith('CAPEX') ? 'CAPEX' : 'OPEX'})`, formatAmount(280000)),
+        row('Committed YTD', formatAmount(147200)),
+        row('This Requisition', formatAmount(ex.amount)),
+        '<div class="divider"></div>',
+        row('Remaining After Approval', formatAmount(remaining), { bold: true, highlight: true }),
+        '<div class="budget-ok">✓ Budget available. No override required.</div>'
+      ].join('');
+
+      document.getElementById('workflowTrack').innerHTML = [
+        node('ORIGINATOR', '📋', 'Requisitioner', 'Dept. User', 'Any Authorised Staff', 'done', today, 'Raised & submitted'),
+        arrow(true),
+        node('STEP 1 · GATE A', '🔍', 'Purchase Review', 'Div. Head of Purchase', 'Zero-Limit · Review Only', 'done', '21 Apr 2026', 'Specs & supplier verified'),
+        arrow(true),
+        node('STEP 1 · GATE B', '💰', 'Finance Review', 'Div. Head of Finance', 'Zero-Limit · Review Only', 'done', '22 Apr 2026', 'Budget confirmed'),
+        arrow(true),
+        node('STEP 2 · AUTHORIZER', '✍️', 'Authorizer', ex.auth, ex.authGrade, 'active', '—', 'Pending action', true),
+        arrow(false),
+        node('STEP 3 · APPROVER', '🔐', 'Approver', ex.approver, ex.appGrade, 'waiting', '—', '—')
+      ].join('');
+
+      document.querySelectorAll('.selector-btn').forEach((btn, index) => {
+        btn.classList.toggle('active', index === currentIndex);
+      });
+    }
+
+    document.querySelectorAll('.selector-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentIndex = Number(btn.dataset.index);
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
